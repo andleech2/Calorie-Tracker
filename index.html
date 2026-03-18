@@ -175,6 +175,8 @@
       <div class="stat-val" id="goal-val">1222 <span>cal</span></div>
       <div class="stat-label" id="rem-label">Remaining</div>
       <div class="stat-val" id="rem-val">1222 <span>cal</span></div>
+      <div class="stat-label" style="color:#7c3aed">Carbs</div>
+      <div class="stat-val" id="carb-val" style="color:#7c3aed;margin-bottom:12px">0 <span>g</span></div>
       <button id="clear-btn" onclick="clearDay()">Clear Day</button>
     </div>
   </div>
@@ -196,7 +198,8 @@
     <div class="section-label" style="margin-bottom:12px">Add New Food</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <input id="new-name" type="text" placeholder="Food name" style="flex:2;min-width:120px;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;color:#0f172a;">
-      <input id="new-cal" type="number" placeholder="Cal" min="1" style="width:70px;padding:7px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Source Code Pro',monospace;outline:none;color:#0f172a;">
+      <input id="new-cal" type="number" placeholder="Cal" min="1" style="width:60px;padding:7px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Source Code Pro',monospace;outline:none;color:#0f172a;">
+      <input id="new-carb" type="number" placeholder="Carbs g" min="0" step="0.1" style="width:72px;padding:7px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Source Code Pro',monospace;outline:none;color:#0f172a;">
       <select id="new-unit" style="flex:1;min-width:80px;padding:7px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;color:#0f172a;background:white;">
         <option value="tbs">tbs</option>
         <option value="each">each</option>
@@ -221,18 +224,18 @@ const GOAL = 1222;
 const CIRC = 2 * Math.PI * 54;
 
 const FOODS_BASE = [
-  { id: 1,  name: "Hamburger Patty", cal: 380, unit: "each" },
-  { id: 2,  name: "Cacao",           cal: 20,  unit: "tbs" },
-  { id: 3,  name: "Coconut Oil",     cal: 130, unit: "tbs" },
-  { id: 4,  name: "Butter",          cal: 110, unit: "tbs" },
-  { id: 5,  name: "Whey",            cal: 20,  unit: "tbs" },
-  { id: 6,  name: "Salmon",          cal: 80,  unit: "can" },
-  { id: 7,  name: "Sardines",        cal: 150, unit: "can" },
-  { id: 8,  name: "Oysters",         cal: 200, unit: "can" },
-  { id: 9,  name: "Mackerel",        cal: 90,  unit: "bag" },
-  { id: 10, name: "Peanut Butter",   cal: 90,  unit: "tbs" },
-  { id: 11, name: "Cheese",          cal: 240, unit: "slice" },
-  { id: 12, name: "Egg",             cal: 80,  unit: "each" },
+  { id: 1,  name: "Hamburger Patty", cal: 380, carb: 0,   unit: "each" },
+  { id: 2,  name: "Cacao",           cal: 20,  carb: 3,   unit: "tbs" },
+  { id: 3,  name: "Coconut Oil",     cal: 130, carb: 0,   unit: "tbs" },
+  { id: 4,  name: "Butter",          cal: 110, carb: 0,   unit: "tbs" },
+  { id: 5,  name: "Whey",            cal: 20,  carb: 0.4, unit: "tbs" },
+  { id: 6,  name: "Salmon",          cal: 80,  carb: 0,   unit: "can" },
+  { id: 7,  name: "Sardines",        cal: 150, carb: 0,   unit: "can" },
+  { id: 8,  name: "Oysters",         cal: 200, carb: 0,   unit: "can" },
+  { id: 9,  name: "Mackerel",        cal: 90,  carb: 0,   unit: "bag" },
+  { id: 10, name: "Peanut Butter",   cal: 90,  carb: 3.5, unit: "tbs" },
+  { id: 11, name: "Cheese",          cal: 240, carb: 2,   unit: "slice" },
+  { id: 12, name: "Egg",             cal: 80,  carb: 0,   unit: "each" },
 ];
 
 // Load saved order or use default
@@ -256,24 +259,26 @@ function saveOrder() {
 function addCustomFood() {
   const nameEl = document.getElementById('new-name');
   const calEl  = document.getElementById('new-cal');
+  const carbEl = document.getElementById('new-carb');
   const unitEl = document.getElementById('new-unit');
   const errEl  = document.getElementById('new-food-error');
   const name = nameEl.value.trim();
   const cal  = parseInt(calEl.value);
+  const carb = parseFloat(carbEl.value) || 0;
   const unit = unitEl.value;
   if (!name || isNaN(cal) || cal <= 0) { errEl.style.display = 'block'; return; }
   errEl.style.display = 'none';
 
   const existing = JSON.parse(localStorage.getItem('food-custom') || '[]');
-  const newId = Date.now(); // unique id
-  const newFood = { id: newId, name, cal, unit, custom: true };
+  const newId = Date.now();
+  const newFood = { id: newId, name, cal, carb, unit, custom: true };
   existing.push(newFood);
   localStorage.setItem('food-custom', JSON.stringify(existing));
 
   FOODS.push(newFood);
   saveOrder();
 
-  nameEl.value = ''; calEl.value = ''; unitEl.value = 'tbs';
+  nameEl.value = ''; calEl.value = ''; carbEl.value = ''; unitEl.value = 'tbs';
   renderGrid();
   render();
 }
@@ -289,8 +294,15 @@ function save() {
 
 function totalCal() {
   return log.reduce((s, e) => {
-    const f = FOODS_BASE.find(f => f.id === e.foodId);
+    const f = FOODS_BASE.find(f => f.id === e.foodId) || FOODS.find(f => f.id === e.foodId);
     return s + (f ? f.cal * e.qty : 0);
+  }, 0);
+}
+
+function totalCarbs() {
+  return log.reduce((s, e) => {
+    const f = FOODS_BASE.find(f => f.id === e.foodId) || FOODS.find(f => f.id === e.foodId);
+    return s + (f ? (f.carb || 0) * e.qty : 0);
   }, 0);
 }
 
@@ -310,6 +322,9 @@ function updateRing() {
   remVal.innerHTML = `${diff} <span>cal</span>`;
   remVal.style.color = over ? '#ef4444' : '#0f172a';
   document.getElementById('clear-btn').style.display = log.length ? 'inline-block' : 'none';
+
+  const carbs = totalCarbs();
+  document.getElementById('carb-val').innerHTML = `${Math.round(carbs * 10) / 10} <span>g</span>`;
 }
 
 function renderLog() {
@@ -495,38 +510,4 @@ function initDragDrop() {
     handle.addEventListener('touchend', e => {
       if (!touchClone) return;
       const touch = e.changedTouches[0];
-      touchClone.style.display = 'none';
-      const el = document.elementFromPoint(touch.clientX, touch.clientY);
-      touchClone.style.display = '';
-      const target = el && el.closest('.food-card');
-      document.body.removeChild(touchClone);
-      touchClone = null;
-      card.classList.remove('dragging');
-      grid.querySelectorAll('.food-card').forEach(c => c.classList.remove('drag-over'));
-
-      if (target) {
-        const targetId = parseInt(target.dataset.id);
-        if (targetId !== touchSrcId) {
-          const srcIdx = FOODS.findIndex(f => f.id === touchSrcId);
-          const tgtIdx = FOODS.findIndex(f => f.id === targetId);
-          const [moved] = FOODS.splice(srcIdx, 1);
-          FOODS.splice(tgtIdx, 0, moved);
-          saveOrder();
-          renderGrid();
-          render();
-        }
-      }
-    });
-  });
-}
-
-// Init
-document.getElementById('today-date').textContent =
-  new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
-renderGrid();
-render();
-renderLog();
-</script>
-</body>
-</ht
+      touchClone.style.di
