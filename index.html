@@ -3,530 +3,530 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cabin Mortgage Calculator</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<title>Calorie Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Source+Code+Pro:wght@600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #f0fdfa 100%);
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 40px 16px 60px;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #f0fdfa 100%);
     font-family: 'Inter', sans-serif;
+    padding: 24px 16px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  .card {
-    width: 100%;
-    max-width: 680px;
-    background: white;
-    border: 2px solid #99f6e4;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(15,118,110,0.10), 0 4px 16px rgba(0,0,0,0.06);
-    overflow: hidden;
-    animation: rise 0.5s cubic-bezier(.16,1,.3,1) both;
-  }
-
-  @keyframes rise {
-    from { opacity:0; transform: translateY(24px); }
-    to   { opacity:1; transform: translateY(0); }
-  }
+  #app { width: 100%; max-width: 480px; }
 
   .header {
     background: linear-gradient(135deg, #0d9488 0%, #2563eb 100%);
-    padding: 28px 32px 24px;
+    border-radius: 16px 16px 0 0;
+    padding: 24px 28px 20px;
     position: relative;
     overflow: hidden;
   }
-
   .header::before {
-    content: '🏕️';
+    content: '🍽️';
     position: absolute;
-    right: 24px;
-    top: 12px;
-    font-size: 56px;
-    opacity: 0.18;
-    transform: rotate(-8deg);
+    right: 20px; top: 10px;
+    font-size: 52px;
+    opacity: 0.15;
   }
+  .header-sub  { font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+  .header-title { font-size: 24px; font-weight: 900; color: white; letter-spacing: -0.01em; }
+  .header-date  { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
 
-  .header h1 {
-    font-size: 26px;
-    font-weight: 900;
-    color: white;
-    letter-spacing: -0.01em;
-    line-height: 1.2;
+  .card {
+    background: white;
+    border: 2px solid #99f6e4;
+    border-top: none;
+    padding: 24px 28px 18px;
   }
-
-  .header p {
-    color: rgba(255,255,255,0.7);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 4px;
-    font-weight: 500;
-  }
-
-  .body {
-    padding: 28px 32px;
+  .card-last {
+    border-radius: 0 0 16px 16px;
+    padding: 16px 28px 24px;
   }
 
   .section-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #0d9488;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #ccfbf1;
+    font-size: 11px; font-weight: 700; color: #0d9488;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 10px;
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 20px;
+  /* Progress ring area */
+  .ring-row { display: flex; align-items: center; gap: 28px; }
+  .ring-wrap { position: relative; flex-shrink: 0; width: 128px; height: 128px; }
+  .ring-wrap svg { display: block; }
+  .ring-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  #ring-total {
+    font-size: 26px; font-weight: 900; color: #0f172a;
+    font-family: 'Source Code Pro', monospace; line-height: 1;
+  }
+  .ring-unit { font-size: 10px; color: #94a3b8; margin-top: 2px; font-weight: 600; }
+
+  .stat-label { font-size: 11px; font-weight: 700; color: #0d9488; text-transform: uppercase; letter-spacing: 0.1em; }
+  .stat-val   { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 10px; }
+  .stat-val span { font-size: 12px; color: #94a3b8; font-weight: 400; }
+  #rem-label  { color: #2563eb; }
+  #rem-val    { color: #0f172a; }
+
+  #clear-btn {
+    font-size: 11px; font-weight: 600; color: #94a3b8;
+    background: none; border: 1px solid #e2e8f0;
+    border-radius: 6px; padding: 4px 10px; cursor: pointer;
+    display: none;
   }
 
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  /* Log */
+  #log-section { display: none; }
+  .log-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 0; border-bottom: 1px solid #f0f9ff;
   }
+  .log-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+  .log-meta  { font-size: 11px; color: #94a3b8; margin-left: 6px; }
+  .log-btns  { display: flex; align-items: center; gap: 5px; }
+  .log-qty   { font-size: 13px; font-weight: 700; color: #0f172a; min-width: 20px; text-align: center; }
 
-  .field.full { grid-column: span 2; }
-
-  label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #475569;
-  }
-
-  .input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .prefix, .suffix {
-    position: absolute;
-    font-family: 'Source Code Pro', monospace;
-    font-size: 13px;
-    color: #94a3b8;
-    pointer-events: none;
+  /* Food grid */
+  .food-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .food-card {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px; padding: 10px 12px;
+    background: #fafafa;
+    transition: border-color 0.15s, background 0.15s, opacity 0.15s, transform 0.15s;
     user-select: none;
   }
-  .prefix { left: 11px; }
-  .suffix { right: 11px; }
-
-  input[type=number], input[type=text] {
-    width: 100%;
-    background: white;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    color: #1e293b;
+  .food-card.logged { border-color: #0d9488; background: #f0fdfa; }
+  .food-card.dragging { opacity: 0.4; transform: scale(0.97); }
+  .food-card.drag-over { border-color: #2563eb !important; background: #eff6ff !important; transform: scale(1.02); }
+  .food-header { display: flex; align-items: flex-start; gap: 5px; margin-bottom: 1px; }
+  .drag-handle {
+    color: #cbd5e1; font-size: 13px; cursor: grab;
+    flex-shrink: 0; line-height: 1.2; touch-action: none;
+  }
+  .drag-handle:active { cursor: grabbing; color: #94a3b8; }
+  .food-name { font-size: 13px; font-weight: 700; color: #0f172a; }
+  .food-cal  { font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
+  .food-row  { display: flex; align-items: center; gap: 5px; }
+  .food-qty-input {
+    width: 44px; padding: 4px 6px;
+    border: 1.5px solid #e2e8f0; border-radius: 6px;
+    font-size: 12px; font-weight: 600; color: #0f172a;
     font-family: 'Source Code Pro', monospace;
-    font-size: 15px;
-    padding: 9px 11px;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    -moz-appearance: textfield;
-    appearance: textfield;
+    outline: none; background: white;
   }
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-  input:focus {
-    outline: none;
-    border-color: #0d9488;
-    box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+  .add-btn {
+    flex: 1; padding: 5px 0;
+    background: linear-gradient(135deg, #0d9488, #2563eb);
+    color: white; border: none; border-radius: 6px;
+    font-size: 11px; font-weight: 700; cursor: pointer;
+    font-family: 'Inter', sans-serif;
   }
 
-  .has-prefix input  { padding-left: 24px; }
-  .has-suffix input  { padding-right: 32px; }
-
-  /* Down payment dual fields */
-  .dp-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+  .ctrl-btn {
+    width: 26px; height: 26px;
+    border: none; border-radius: 6px;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; display: inline-flex;
+    align-items: center; justify-content: center;
+    padding: 0; font-family: 'Inter', sans-serif;
   }
-
-  .dp-row .input-wrap { flex: 1; }
-
-  .dp-divider {
-    color: #cbd5e1;
-    font-size: 14px;
-    flex-shrink: 0;
-  }
-
-  .divider {
-    border: none;
-    border-top: 2px solid #f1f5f9;
-    margin: 4px 0 20px;
-  }
-
-  /* Output panel */
-  .output {
-    background: linear-gradient(135deg, #0d9488 0%, #2563eb 100%);
-    border-radius: 16px;
-    padding: 22px 24px;
-    margin-bottom: 16px;
-    color: white;
-  }
-
-  .output-main {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-
-  .output-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.75);
-  }
-
-  .output-amount {
-    font-size: 44px;
-    font-weight: 900;
-    color: white;
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
-
-  .output-mo {
-    font-size: 14px;
-    color: rgba(255,255,255,0.6);
-    align-self: flex-end;
-    padding-bottom: 4px;
-    font-weight: 500;
-  }
-
-  .breakdown {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(255,255,255,0.2);
-  }
-
-  .bk-item { display: flex; flex-direction: column; gap: 3px; }
-  .bk-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
-  .bk-value { font-family: 'Source Code Pro', monospace; font-size: 14px; color: white; font-weight: 600; }
-
-  /* Balloon panel */
-  .balloon {
-    background: linear-gradient(135deg, #f8fafc 0%, #f0fdfa 100%);
-    border: 2px solid #99f6e4;
-    border-radius: 16px;
-    padding: 20px 24px;
-  }
-
-  .balloon-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  .balloon-icon {
-    font-size: 18px;
-  }
-
-  .balloon-title {
-    font-size: 13px;
-    font-weight: 800;
-    color: #0d9488;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .balloon-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
-  .bal-item { display: flex; flex-direction: column; gap: 3px; }
-  .bal-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }
-  .bal-value { font-family: 'Source Code Pro', monospace; font-size: 16px; color: #1e293b; font-weight: 600; }
-  .bal-value.accent { color: #dc2626; font-size: 20px; }
-  .bal-value.green { color: #0d9488; }
-
-  .note {
-    font-size: 11px;
-    color: #64748b;
-    margin-top: 12px;
-    line-height: 1.6;
-    font-weight: 500;
-  }
-
-  @media (max-width: 520px) {
-    .grid { grid-template-columns: 1fr; }
-    .field.full { grid-column: span 1; }
-    .breakdown { grid-template-columns: 1fr 1fr; }
-    .balloon-grid { grid-template-columns: 1fr; }
-    .body { padding: 20px 16px; }
-    .header { padding: 20px 16px; }
-  }
+  .btn-dec  { background: #f1f5f9; color: #0f172a; }
+  .btn-inc  { background: #0d9488; color: white; }
+  .btn-del  { background: #fee2e2; color: #ef4444; margin-left: 2px; }
 </style>
 </head>
 <body>
-<div class="card">
+<div id="app">
+
+  <!-- Header -->
   <div class="header">
-    <h1>Cabin Mortgage Calculator</h1>
-    <p>30-Year Fixed · Balloon Tracker</p>
+    <div class="header-sub">Daily Tracker</div>
+    <div class="header-title">Calorie Counter</div>
+    <div class="header-date" id="today-date"></div>
   </div>
 
-  <div class="body">
-    <div class="section-label">Loan Details</div>
-
-    <div class="grid">
-      <div class="field">
-        <label>Cabin Price</label>
-        <div class="input-wrap has-prefix">
-          <span class="prefix">$</span>
-          <input type="number" id="price" value="350000" min="0" step="1000" oninput="syncFromAmt(); calc()">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Down Payment</label>
-        <div class="dp-row">
-          <div class="input-wrap has-prefix">
-            <span class="prefix">$</span>
-            <input type="number" id="downAmt" value="70000" min="0" step="500" oninput="syncFromAmt()">
-          </div>
-          <span class="dp-divider">/</span>
-          <div class="input-wrap has-suffix" style="max-width:90px">
-            <input type="number" id="downPct" value="20" min="0" max="100" step="0.1" oninput="syncFromPct()">
-            <span class="suffix">%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Interest Rate</label>
-        <div class="input-wrap has-suffix">
-          <input type="number" id="rate" value="6.75" min="0" max="25" step="0.01" oninput="calc()">
-          <span class="suffix">%</span>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Loan Term</label>
-        <div class="input-wrap has-suffix">
-          <input type="number" id="term" value="30" min="1" max="30" step="1" oninput="calc()">
-          <span class="suffix">yrs</span>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Monthly Insurance</label>
-        <div class="input-wrap has-prefix">
-          <span class="prefix">$</span>
-          <input type="number" id="ins" value="120" min="0" step="1" oninput="calc()">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Yearly Property Tax</label>
-        <div class="input-wrap has-prefix">
-          <span class="prefix">$</span>
-          <input type="number" id="tax" value="3200" min="0" step="100" oninput="calc()">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>First Payment Date</label>
-        <div class="dp-row">
-          <div class="input-wrap has-suffix" style="max-width:90px">
-            <input type="number" id="startMonth" value="5" min="1" max="12" step="1" oninput="calc()">
-            <span class="suffix" style="font-size:11px">mo</span>
-          </div>
-          <span class="dp-divider">/</span>
-          <div class="input-wrap">
-            <input type="number" id="startYear" value="2026" min="2020" max="2060" step="1" oninput="calc()">
-          </div>
-        </div>
+  <!-- Progress Ring -->
+  <div class="card ring-row">
+    <div class="ring-wrap">
+      <svg width="128" height="128">
+        <circle cx="64" cy="64" r="54" fill="none" stroke="#e0f2fe" stroke-width="10"/>
+        <circle id="ring-arc" cx="64" cy="64" r="54" fill="none"
+          stroke="#0d9488" stroke-width="10"
+          stroke-dasharray="0 339.292"
+          stroke-linecap="round"
+          transform="rotate(-90 64 64)"
+          style="transition: stroke-dasharray 0.4s ease, stroke 0.3s"/>
+      </svg>
+      <div class="ring-center">
+        <span id="ring-total">0</span>
+        <span class="ring-unit">cal</span>
       </div>
     </div>
-
-    <hr class="divider">
-
-    <!-- Output -->
-    <div class="output">
-      <div class="output-label">Total Monthly Payment</div>
-      <div class="output-main">
-        <div class="output-amount" id="totalPayment">—</div>
-        <div class="output-mo">/mo</div>
-      </div>
-      <div class="breakdown">
-        <div class="bk-item">
-          <div class="bk-label">Principal &amp; Int</div>
-          <div class="bk-value" id="piOut">—</div>
-        </div>
-        <div class="bk-item">
-          <div class="bk-label">Insurance</div>
-          <div class="bk-value" id="insOut">—</div>
-        </div>
-        <div class="bk-item">
-          <div class="bk-label">Tax (mo)</div>
-          <div class="bk-value" id="taxOut">—</div>
-        </div>
-        <div class="bk-item">
-          <div class="bk-label">Loan Amount</div>
-          <div class="bk-value" id="loanOut">—</div>
-        </div>
-        <div class="bk-item">
-          <div class="bk-label">Down Payment</div>
-          <div class="bk-value" id="downOut">—</div>
-        </div>
-        <div class="bk-item">
-          <div class="bk-label">Interest to Nov '30</div>
-          <div class="bk-value" id="intTotalOut">—</div>
-        </div>
-      </div>
+    <div style="flex:1">
+      <div class="stat-label">Goal</div>
+      <div class="stat-val" id="goal-val">1222 <span>cal</span></div>
+      <div class="stat-label" id="rem-label">Remaining</div>
+      <div class="stat-val" id="rem-val">1222 <span>cal</span></div>
+      <button id="clear-btn" onclick="clearDay()">Clear Day</button>
     </div>
-
-    <!-- Balloon section -->
-    <div class="balloon">
-      <div class="balloon-header">
-        <span class="balloon-icon">🎈</span>
-        <span class="balloon-title">Land Sale Balloon · November 2030</span>
-      </div>
-      <div class="balloon-grid">
-        <div class="bal-item">
-          <div class="bal-label">Balloon Payment</div>
-          <div class="bal-value green">$275,000</div>
-        </div>
-        <div class="bal-item">
-          <div class="bal-label">Balance Owed (Nov 2030)</div>
-          <div class="bal-value accent" id="balanceAtBalloon">—</div>
-        </div>
-        <div class="bal-item">
-          <div class="bal-label">Payments Made by Then</div>
-          <div class="bal-value" id="paymentsBy">—</div>
-        </div>
-        <div class="bal-item">
-          <div class="bal-label">Remaining After Balloon</div>
-          <div class="bal-value" id="afterBalloon">—</div>
-        </div>
-      </div>
-      <div class="note" id="balloonNote">—</div>
-    </div>
-
   </div>
+
+  <!-- Today's Log -->
+  <div class="card" id="log-section">
+    <div class="section-label">Today's Log</div>
+    <div id="log-list"></div>
+  </div>
+
+  <!-- Add Food -->
+  <div class="card">
+    <div class="section-label">Add Food</div>
+    <div class="food-grid" id="food-grid"></div>
+  </div>
+
+  <!-- New Custom Food -->
+  <div class="card card-last">
+    <div class="section-label" style="margin-bottom:12px">Add New Food</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input id="new-name" type="text" placeholder="Food name" style="flex:2;min-width:120px;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;color:#0f172a;">
+      <input id="new-cal" type="number" placeholder="Cal" min="1" style="width:70px;padding:7px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Source Code Pro',monospace;outline:none;color:#0f172a;">
+      <select id="new-unit" style="flex:1;min-width:80px;padding:7px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;color:#0f172a;background:white;">
+        <option value="tbs">tbs</option>
+        <option value="each">each</option>
+        <option value="can">can</option>
+        <option value="bag">bag</option>
+        <option value="slice">slice</option>
+        <option value="cup">cup</option>
+        <option value="oz">oz</option>
+        <option value="g">g</option>
+      </select>
+    </div>
+    <button onclick="addCustomFood()" style="margin-top:10px;width:100%;padding:9px;background:linear-gradient(135deg,#0d9488,#2563eb);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+      + Save Food
+    </button>
+    <div id="new-food-error" style="font-size:11px;color:#ef4444;margin-top:6px;display:none;">Please enter a name and calories.</div>
+  </div>
+
 </div>
 
 <script>
-  function fmt(n) {
-    return '$' + Math.round(n).toLocaleString('en-US');
-  }
+const GOAL = 1222;
+const CIRC = 2 * Math.PI * 54;
 
-  function syncFromAmt() {
-    const price = parseFloat(document.getElementById('price').value) || 0;
-    const amt   = parseFloat(document.getElementById('downAmt').value) || 0;
-    const pct   = price > 0 ? (amt / price * 100) : 0;
-    document.getElementById('downPct').value = parseFloat(pct.toFixed(2));
-    calc();
-  }
+const FOODS_BASE = [
+  { id: 1,  name: "Hamburger Patty", cal: 380, unit: "each" },
+  { id: 2,  name: "Cacao",           cal: 20,  unit: "tbs" },
+  { id: 3,  name: "Coconut Oil",     cal: 130, unit: "tbs" },
+  { id: 4,  name: "Butter",          cal: 110, unit: "tbs" },
+  { id: 5,  name: "Whey",            cal: 20,  unit: "tbs" },
+  { id: 6,  name: "Salmon",          cal: 80,  unit: "can" },
+  { id: 7,  name: "Sardines",        cal: 150, unit: "can" },
+  { id: 8,  name: "Oysters",         cal: 200, unit: "can" },
+  { id: 9,  name: "Mackerel",        cal: 90,  unit: "bag" },
+  { id: 10, name: "Peanut Butter",   cal: 90,  unit: "tbs" },
+  { id: 11, name: "Cheese",          cal: 240, unit: "slice" },
+  { id: 12, name: "Egg",             cal: 80,  unit: "each" },
+];
 
-  function syncFromPct() {
-    const price = parseFloat(document.getElementById('price').value) || 0;
-    const pct   = parseFloat(document.getElementById('downPct').value) || 0;
-    document.getElementById('downAmt').value = Math.round(price * pct / 100);
-    calc();
-  }
-
-  function getDownAbs() {
-    return parseFloat(document.getElementById('downAmt').value) || 0;
-  }
-
-  function calc() {
-    const price      = parseFloat(document.getElementById('price').value) || 0;
-    const downAbs    = getDownAbs();
-    const annualRate = parseFloat(document.getElementById('rate').value) || 0;
-    const termYrs    = parseFloat(document.getElementById('term').value) || 30;
-    const insMonthly = parseFloat(document.getElementById('ins').value) || 0;
-    const taxYearly  = parseFloat(document.getElementById('tax').value) || 0;
-    const startMonth = parseInt(document.getElementById('startMonth').value) || 1;
-    const startYear  = parseInt(document.getElementById('startYear').value) || 2026;
-
-    const loan = Math.max(price - downAbs, 0);
-    const r    = annualRate / 100 / 12;
-    const n    = termYrs * 12;
-    const taxMonthly = taxYearly / 12;
-
-    let pi = 0;
-    if (loan > 0 && r > 0 && n > 0) {
-      pi = loan * (r * Math.pow(1+r, n)) / (Math.pow(1+r, n) - 1);
-    } else if (loan > 0 && r === 0 && n > 0) {
-      pi = loan / n;
+// Load saved order or use default
+function loadOrder() {
+  try {
+    const custom = JSON.parse(localStorage.getItem('food-custom') || '[]');
+    const all = [...FOODS_BASE, ...custom];
+    const saved = JSON.parse(localStorage.getItem('food-order') || 'null');
+    if (saved && saved.length === all.length) {
+      return saved.map(id => all.find(f => f.id === id)).filter(Boolean);
     }
+    return all;
+  } catch {}
+  return [...FOODS_BASE];
+}
 
-    const total = pi + insMonthly + taxMonthly;
+function saveOrder() {
+  localStorage.setItem('food-order', JSON.stringify(FOODS.map(f => f.id)));
+}
 
-    // Balloon date: November 2030
-    const balloonYear  = 2030;
-    const balloonMonth = 11;
+function addCustomFood() {
+  const nameEl = document.getElementById('new-name');
+  const calEl  = document.getElementById('new-cal');
+  const unitEl = document.getElementById('new-unit');
+  const errEl  = document.getElementById('new-food-error');
+  const name = nameEl.value.trim();
+  const cal  = parseInt(calEl.value);
+  const unit = unitEl.value;
+  if (!name || isNaN(cal) || cal <= 0) { errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
 
-    // Payments made = months from first payment to balloon month (inclusive)
-    let paymentsMade = (balloonYear - startYear) * 12 + (balloonMonth - startMonth) + 1;
-    paymentsMade = Math.max(0, Math.min(paymentsMade, n));
+  const existing = JSON.parse(localStorage.getItem('food-custom') || '[]');
+  const newId = Date.now(); // unique id
+  const newFood = { id: newId, name, cal, unit, custom: true };
+  existing.push(newFood);
+  localStorage.setItem('food-custom', JSON.stringify(existing));
 
-    // Balance remaining after paymentsMade payments
-    let balance = loan;
-    if (r > 0) {
-      balance = loan * Math.pow(1+r, paymentsMade) - pi * (Math.pow(1+r, paymentsMade) - 1) / r;
-    } else if (n > 0) {
-      balance = loan - (loan / n) * paymentsMade;
+  FOODS.push(newFood);
+  saveOrder();
+
+  nameEl.value = ''; calEl.value = ''; unitEl.value = 'tbs';
+  renderGrid();
+  render();
+}
+
+let FOODS = loadOrder();
+
+const todayKey = () => `callog:${new Date().toISOString().slice(0,10)}`;
+let log = JSON.parse(localStorage.getItem(todayKey()) || '[]');
+
+function save() {
+  localStorage.setItem(todayKey(), JSON.stringify(log));
+}
+
+function totalCal() {
+  return log.reduce((s, e) => {
+    const f = FOODS_BASE.find(f => f.id === e.foodId);
+    return s + (f ? f.cal * e.qty : 0);
+  }, 0);
+}
+
+function updateRing() {
+  const total = totalCal();
+  const over = total > GOAL;
+  const pct = Math.min(total / GOAL, 1);
+  document.getElementById('ring-total').textContent = total;
+  document.getElementById('ring-total').style.color = over ? '#ef4444' : '#0f172a';
+  document.getElementById('ring-arc').setAttribute('stroke-dasharray', `${pct * CIRC} ${CIRC}`);
+  document.getElementById('ring-arc').setAttribute('stroke', over ? '#ef4444' : '#0d9488');
+  const remLabel = document.getElementById('rem-label');
+  const remVal = document.getElementById('rem-val');
+  const diff = Math.abs(GOAL - total);
+  remLabel.textContent = over ? 'Over by' : 'Remaining';
+  remLabel.style.color = over ? '#ef4444' : '#2563eb';
+  remVal.innerHTML = `${diff} <span>cal</span>`;
+  remVal.style.color = over ? '#ef4444' : '#0f172a';
+  document.getElementById('clear-btn').style.display = log.length ? 'inline-block' : 'none';
+}
+
+function renderLog() {
+  const section = document.getElementById('log-section');
+  const list = document.getElementById('log-list');
+  if (!log.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  list.innerHTML = log.map(entry => {
+    const f = FOODS_BASE.find(f => f.id === entry.foodId);
+    if (!f) return '';
+    return `
+      <div class="log-row">
+        <div style="flex:1">
+          <span class="log-name">${f.name}</span>
+          <span class="log-meta">${entry.qty} ${f.unit} · ${f.cal * entry.qty} cal</span>
+        </div>
+        <div class="log-btns">
+          <button class="ctrl-btn btn-dec" onclick="adjustQty(${f.id}, -1)">−</button>
+          <span class="log-qty">${entry.qty}</span>
+          <button class="ctrl-btn btn-inc" onclick="adjustQty(${f.id}, 1)">+</button>
+          <button class="ctrl-btn btn-del" onclick="removeEntry(${f.id})">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderGrid() {
+  const grid = document.getElementById('food-grid');
+  grid.innerHTML = FOODS.map(f => {
+    const inLog = log.some(e => e.foodId === f.id);
+    const deleteBtn = f.custom ? `<button onclick="deleteCustomFood(${f.id})" title="Delete food" style="background:#fee2e2;color:#ef4444;border:none;border-radius:5px;width:22px;height:22px;font-size:11px;cursor:pointer;flex-shrink:0;font-weight:700;">✕</button>` : '';
+    return `
+      <div class="food-card ${inLog ? 'logged' : ''}" id="fc-${f.id}" data-id="${f.id}">
+        <div class="food-header">
+          <span class="drag-handle" title="Drag to reorder">⠿</span>
+          <span class="food-name" style="flex:1">${f.name}</span>
+          ${deleteBtn}
+        </div>
+        <div class="food-cal">${f.cal} cal / ${f.unit}</div>
+        <div class="food-row">
+          <input class="food-qty-input" id="qty-${f.id}" type="number" min="0.5" step="0.5" value="1">
+          <button class="add-btn" onclick="addEntry(${f.id})">+ Add</button>
+        </div>
+      </div>`;
+  }).join('');
+  initDragDrop();
+}
+
+function render() {
+  updateRing();
+  renderLog();
+  FOODS.forEach(f => {
+    const card = document.getElementById(`fc-${f.id}`);
+    if (card) {
+      const inLog = log.some(e => e.foodId === f.id);
+      card.className = `food-card ${inLog ? 'logged' : ''}`;
+      card.setAttribute('data-id', f.id);
     }
-    balance = Math.max(balance, 0);
+  });
+}
 
-    // Interest paid through balloon = total paid - principal paid
-    const principalPaid = loan - balance;
-    const interestToBalloon = Math.max((pi * paymentsMade) - principalPaid, 0);
+function addEntry(foodId) {
+  const input = document.getElementById(`qty-${foodId}`);
+  const qty = parseFloat(input.value);
+  if (isNaN(qty) || qty <= 0) return;
+  const idx = log.findIndex(e => e.foodId === foodId);
+  if (idx >= 0) log[idx].qty += qty;
+  else log.push({ foodId, qty });
+  input.value = 1;
+  save(); render(); renderLog();
+}
 
-    document.getElementById('totalPayment').textContent = total > 0 ? fmt(total) : '—';
-    document.getElementById('piOut').textContent = fmt(pi);
-    document.getElementById('insOut').textContent = fmt(insMonthly);
-    document.getElementById('taxOut').textContent = fmt(taxMonthly);
-    document.getElementById('loanOut').textContent = fmt(loan);
-    document.getElementById('downOut').textContent = fmt(downAbs);
-    document.getElementById('intTotalOut').textContent = fmt(interestToBalloon);
+function removeEntry(foodId) {
+  log = log.filter(e => e.foodId !== foodId);
+  save(); render(); renderLog();
+}
 
-    const balloonAmt = 275000;
-    const remaining  = balance - balloonAmt;
+function adjustQty(foodId, delta) {
+  const idx = log.findIndex(e => e.foodId === foodId);
+  if (idx < 0) return;
+  log[idx].qty = Math.max(0, log[idx].qty + delta);
+  if (log[idx].qty === 0) log.splice(idx, 1);
+  save(); render(); renderLog();
+}
 
-    document.getElementById('balanceAtBalloon').textContent = fmt(balance);
-    document.getElementById('paymentsBy').textContent = paymentsMade + ' payments';
+function clearDay() {
+  log = []; save(); render(); renderLog();
+}
 
-    if (balance <= 0) {
-      document.getElementById('afterBalloon').textContent = fmt(0);
-      document.getElementById('balloonNote').textContent = 'Loan fully paid before November 2030.';
-    } else if (remaining <= 0) {
-      document.getElementById('afterBalloon').textContent = fmt(0) + ' 🎉';
-      document.getElementById('afterBalloon').style.color = '#7ec87e';
-      document.getElementById('balloonNote').textContent =
-        `Your $275,000 land sale covers the full remaining balance — and leaves you ${fmt(-remaining)} to spare. Loan would be paid off entirely.`;
-    } else {
-      document.getElementById('afterBalloon').textContent = fmt(remaining);
-      document.getElementById('afterBalloon').style.color = '#e07060';
-      document.getElementById('balloonNote').textContent =
-        `After applying your $275,000 balloon payment in November 2030, you'd still owe ${fmt(remaining)} on the mortgage. You'd need to refinance or continue making payments on the remaining balance.`;
-    }
-  }
+function deleteCustomFood(foodId) {
+  FOODS = FOODS.filter(f => f.id !== foodId);
+  const custom = JSON.parse(localStorage.getItem('food-custom') || '[]').filter(f => f.id !== foodId);
+  localStorage.setItem('food-custom', JSON.stringify(custom));
+  saveOrder();
+  removeEntry(foodId);
+  renderGrid();
+  render();
+}
 
-  calc();
+// ── Drag & Drop ──────────────────────────────────────────
+let dragSrcId = null;
+
+function initDragDrop() {
+  const grid = document.getElementById('food-grid');
+
+  grid.querySelectorAll('.food-card').forEach(card => {
+    const handle = card.querySelector('.drag-handle');
+
+    // Desktop drag
+    handle.addEventListener('mousedown', () => { card.setAttribute('draggable', 'true'); });
+    card.addEventListener('dragend', () => { card.setAttribute('draggable', 'false'); });
+
+    card.addEventListener('dragstart', e => {
+      dragSrcId = parseInt(card.dataset.id);
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => card.classList.add('dragging'), 0);
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      grid.querySelectorAll('.food-card').forEach(c => c.classList.remove('drag-over'));
+    });
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      grid.querySelectorAll('.food-card').forEach(c => c.classList.remove('drag-over'));
+      if (parseInt(card.dataset.id) !== dragSrcId) card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      const targetId = parseInt(card.dataset.id);
+      if (targetId === dragSrcId) return;
+      const srcIdx = FOODS.findIndex(f => f.id === dragSrcId);
+      const tgtIdx = FOODS.findIndex(f => f.id === targetId);
+      const [moved] = FOODS.splice(srcIdx, 1);
+      FOODS.splice(tgtIdx, 0, moved);
+      saveOrder();
+      renderGrid();
+      render();
+    });
+
+    // Touch drag
+    let touchClone = null, touchStartX, touchStartY, touchSrcId;
+
+    handle.addEventListener('touchstart', e => {
+      touchSrcId = parseInt(card.dataset.id);
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      const rect = card.getBoundingClientRect();
+      touchClone = card.cloneNode(true);
+      touchClone.style.cssText = `
+        position:fixed; left:${rect.left}px; top:${rect.top}px;
+        width:${rect.width}px; opacity:0.85; pointer-events:none;
+        z-index:9999; border-radius:10px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+        transition: none;
+      `;
+      document.body.appendChild(touchClone);
+      card.classList.add('dragging');
+      e.preventDefault();
+    }, { passive: false });
+
+    handle.addEventListener('touchmove', e => {
+      if (!touchClone) return;
+      const touch = e.touches[0];
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      touchClone.style.transform = `translate(${dx}px, ${dy}px)`;
+
+      // Highlight target
+      touchClone.style.display = 'none';
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      touchClone.style.display = '';
+      const target = el && el.closest('.food-card');
+      grid.querySelectorAll('.food-card').forEach(c => c.classList.remove('drag-over'));
+      if (target && parseInt(target.dataset.id) !== touchSrcId) {
+        target.classList.add('drag-over');
+      }
+      e.preventDefault();
+    }, { passive: false });
+
+    handle.addEventListener('touchend', e => {
+      if (!touchClone) return;
+      const touch = e.changedTouches[0];
+      touchClone.style.display = 'none';
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      touchClone.style.display = '';
+      const target = el && el.closest('.food-card');
+      document.body.removeChild(touchClone);
+      touchClone = null;
+      card.classList.remove('dragging');
+      grid.querySelectorAll('.food-card').forEach(c => c.classList.remove('drag-over'));
+
+      if (target) {
+        const targetId = parseInt(target.dataset.id);
+        if (targetId !== touchSrcId) {
+          const srcIdx = FOODS.findIndex(f => f.id === touchSrcId);
+          const tgtIdx = FOODS.findIndex(f => f.id === targetId);
+          const [moved] = FOODS.splice(srcIdx, 1);
+          FOODS.splice(tgtIdx, 0, moved);
+          saveOrder();
+          renderGrid();
+          render();
+        }
+      }
+    });
+  });
+}
+
+// Init
+document.getElementById('today-date').textContent =
+  new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+renderGrid();
+render();
+renderLog();
 </script>
 </body>
-</html>
+</ht
