@@ -225,17 +225,18 @@ const CIRC = 2 * Math.PI * 54;
 
 const FOODS_BASE = [
   { id: 1,  name: "Hamburger Patty", cal: 380, carb: 0,   unit: "each" },
+  { id: 12, name: "Egg",             cal: 80,  carb: 0,   unit: "each" },
+  { id: 11, name: "Cheese",          cal: 240, carb: 2,   unit: "slice" },
+  { id: 4,  name: "Butter",          cal: 110, carb: 0,   unit: "tbs" },
   { id: 2,  name: "Cacao",           cal: 20,  carb: 3,   unit: "tbs" },
   { id: 3,  name: "Coconut Oil",     cal: 130, carb: 0,   unit: "tbs" },
-  { id: 4,  name: "Butter",          cal: 110, carb: 0,   unit: "tbs" },
   { id: 5,  name: "Whey",            cal: 20,  carb: 0.4, unit: "tbs" },
-  { id: 6,  name: "Salmon",          cal: 80,  carb: 0,   unit: "can" },
+  { id: 13, name: "Beet Root",       cal: 15,  carb: 3,   unit: "tsp" },
   { id: 7,  name: "Sardines",        cal: 150, carb: 0,   unit: "can" },
   { id: 8,  name: "Oysters",         cal: 200, carb: 0,   unit: "can" },
+  { id: 6,  name: "Salmon",          cal: 80,  carb: 0,   unit: "can" },
   { id: 9,  name: "Mackerel",        cal: 90,  carb: 0,   unit: "bag" },
   { id: 10, name: "Peanut Butter",   cal: 90,  carb: 3.5, unit: "tbs" },
-  { id: 11, name: "Cheese",          cal: 240, carb: 2,   unit: "slice" },
-  { id: 12, name: "Egg",             cal: 80,  carb: 0,   unit: "each" },
 ];
 
 // Load saved order or use default
@@ -245,7 +246,8 @@ function loadOrder() {
     const all = [...FOODS_BASE, ...custom];
     const saved = JSON.parse(localStorage.getItem('food-order') || 'null');
     if (saved && saved.length === all.length) {
-      return saved.map(id => all.find(f => f.id === id)).filter(Boolean);
+      const reordered = saved.map(id => all.find(f => f.id === id)).filter(Boolean);
+      if (reordered.length === all.length) return reordered;
     }
     return all;
   } catch {}
@@ -506,42 +508,4 @@ function initDragDrop() {
       }
       e.preventDefault();
     }, { passive: false });
-
-    handle.addEventListener('touchend', e => {
-      if (!touchClone) return;
-      const touch = e.changedTouches[0];
-      touchClone.style.display = 'none';
-      const el = document.elementFromPoint(touch.clientX, touch.clientY);
-      touchClone.style.display = '';
-      const target = el && el.closest('.food-card');
-      document.body.removeChild(touchClone);
-      touchClone = null;
-      card.classList.remove('dragging');
-      grid.querySelectorAll('.food-card').forEach(c => c.classList.remove('drag-over'));
-
-      if (target) {
-        const targetId = parseInt(target.dataset.id);
-        if (targetId !== touchSrcId) {
-          const srcIdx = FOODS.findIndex(f => f.id === touchSrcId);
-          const tgtIdx = FOODS.findIndex(f => f.id === targetId);
-          const [moved] = FOODS.splice(srcIdx, 1);
-          FOODS.splice(tgtIdx, 0, moved);
-          saveOrder();
-          renderGrid();
-          render();
-        }
-      }
-    });
-  });
-}
-
-// Init
-document.getElementById('today-date').textContent =
-  new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
-renderGrid();
-render();
-renderLog();
-</script>
-</body>
-</html>
+ 
