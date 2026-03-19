@@ -508,4 +508,42 @@ function initDragDrop() {
       }
       e.preventDefault();
     }, { passive: false });
- 
+
+    handle.addEventListener('touchend', e => {
+      if (!touchClone) return;
+      const touch = e.changedTouches[0];
+      touchClone.style.display = 'none';
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      touchClone.style.display = '';
+      const target = el && el.closest('.food-card');
+      document.body.removeChild(touchClone);
+      touchClone = null;
+      card.classList.remove('dragging');
+      grid.querySelectorAll('.food-card').forEach(c => c.classList.remove('drag-over'));
+
+      if (target) {
+        const targetId = parseInt(target.dataset.id);
+        if (targetId !== touchSrcId) {
+          const srcIdx = FOODS.findIndex(f => f.id === touchSrcId);
+          const tgtIdx = FOODS.findIndex(f => f.id === targetId);
+          const [moved] = FOODS.splice(srcIdx, 1);
+          FOODS.splice(tgtIdx, 0, moved);
+          saveOrder();
+          renderGrid();
+          render();
+        }
+      }
+    });
+  });
+}
+
+// Init
+document.getElementById('today-date').textContent =
+  new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+renderGrid();
+render();
+renderLog();
+</script>
+</body>
+</html>
