@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calorie Tracker</title>
+<title>Calorie & Carb Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Source+Code+Pro:wght@600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -57,7 +57,7 @@
 
   /* Progress ring area */
   .ring-row { display: flex; align-items: center; gap: 28px; }
-  .ring-wrap { position: relative; flex-shrink: 0; width: 128px; height: 128px; }
+  .ring-wrap { position: relative; flex-shrink: 0; width: 108px; height: 108px; }
   .ring-wrap svg { display: block; }
   .ring-center {
     position: absolute; inset: 0;
@@ -149,34 +149,69 @@
   <!-- Header -->
   <div class="header">
     <div class="header-sub">Daily Tracker</div>
-    <div class="header-title">Calorie Counter</div>
+    <div class="header-title">Calorie & Carb Tracker</div>
     <div class="header-date" id="today-date"></div>
   </div>
 
-  <!-- Progress Ring -->
-  <div class="card ring-row">
-    <div class="ring-wrap">
-      <svg width="128" height="128">
-        <circle cx="64" cy="64" r="54" fill="none" stroke="#e0f2fe" stroke-width="10"/>
-        <circle id="ring-arc" cx="64" cy="64" r="54" fill="none"
-          stroke="#0d9488" stroke-width="10"
-          stroke-dasharray="0 339.292"
-          stroke-linecap="round"
-          transform="rotate(-90 64 64)"
-          style="transition: stroke-dasharray 0.4s ease, stroke 0.3s"/>
-      </svg>
-      <div class="ring-center">
-        <span id="ring-total">0</span>
-        <span class="ring-unit">cal</span>
+  <!-- Progress Rings -->
+  <div class="card" style="padding:20px 20px 16px;">
+    <div style="display:flex;gap:12px;align-items:flex-start;">
+
+      <!-- Cal Ring -->
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+        <div class="ring-wrap">
+          <svg width="108" height="108">
+            <circle cx="54" cy="54" r="44" fill="none" stroke="#e0f2fe" stroke-width="9"/>
+            <circle id="ring-arc" cx="54" cy="54" r="44" fill="none"
+              stroke="#0d9488" stroke-width="9"
+              stroke-dasharray="0 276.46"
+              stroke-linecap="round"
+              transform="rotate(-90 54 54)"
+              style="transition: stroke-dasharray 0.4s ease, stroke 0.3s"/>
+          </svg>
+          <div class="ring-center">
+            <span id="ring-total" style="font-size:22px;font-weight:900;font-family:'Source Code Pro',monospace;line-height:1;color:#0f172a;">0</span>
+            <span class="ring-unit">cal</span>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:8px;">
+          <div class="stat-label">Goal</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;">1222 <span style="font-size:11px;color:#94a3b8;font-weight:400;">cal</span></div>
+          <div class="stat-label" id="rem-label" style="margin-top:4px;">Remaining</div>
+          <div style="font-size:15px;font-weight:700;" id="rem-val">1222 <span style="font-size:11px;color:#94a3b8;font-weight:400;">cal</span></div>
+        </div>
       </div>
+
+      <!-- Divider -->
+      <div style="width:1px;background:#e0f2fe;align-self:stretch;margin:4px 0;"></div>
+
+      <!-- Carb Ring -->
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+        <div class="ring-wrap">
+          <svg width="108" height="108">
+            <circle cx="54" cy="54" r="44" fill="none" stroke="#ede9fe" stroke-width="9"/>
+            <circle id="carb-arc" cx="54" cy="54" r="44" fill="none"
+              stroke="#7c3aed" stroke-width="9"
+              stroke-dasharray="0 276.46"
+              stroke-linecap="round"
+              transform="rotate(-90 54 54)"
+              style="transition: stroke-dasharray 0.4s ease, stroke 0.3s"/>
+          </svg>
+          <div class="ring-center">
+            <span id="carb-total" style="font-size:22px;font-weight:900;font-family:'Source Code Pro',monospace;line-height:1;color:#7c3aed;">0</span>
+            <span class="ring-unit" style="color:#7c3aed;">g</span>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:8px;">
+          <div class="stat-label" style="color:#7c3aed;">Goal</div>
+          <div style="font-size:15px;font-weight:700;color:#7c3aed;">20 <span style="font-size:11px;color:#94a3b8;font-weight:400;">g</span></div>
+          <div class="stat-label" id="carb-rem-label" style="margin-top:4px;color:#7c3aed;">Remaining</div>
+          <div style="font-size:15px;font-weight:700;" id="carb-rem-val">20 <span style="font-size:11px;color:#94a3b8;font-weight:400;">g</span></div>
+        </div>
+      </div>
+
     </div>
-    <div style="flex:1">
-      <div class="stat-label">Goal</div>
-      <div class="stat-val" id="goal-val">1222 <span>cal</span></div>
-      <div class="stat-label" id="rem-label">Remaining</div>
-      <div class="stat-val" id="rem-val">1222 <span>cal</span></div>
-      <div class="stat-label" style="color:#7c3aed">Carbs</div>
-      <div class="stat-val" id="carb-val" style="color:#7c3aed;margin-bottom:12px">0 <span>g</span></div>
+    <div style="text-align:center;margin-top:12px;">
       <button id="clear-btn" onclick="clearDay()">Clear Day</button>
     </div>
   </div>
@@ -221,7 +256,6 @@
 
 <script>
 const GOAL = 1222;
-const CIRC = 2 * Math.PI * 54;
 
 const FOODS_BASE = [
   { id: 1,  name: "Hamburger Patty", cal: 380, carb: 0,   unit: "each" },
@@ -308,25 +342,46 @@ function totalCarbs() {
   }, 0);
 }
 
+const CARB_GOAL = 20;
+const CAL_CIRC  = 2 * Math.PI * 44;
+const CARB_CIRC = 2 * Math.PI * 44;
+
 function updateRing() {
   const total = totalCal();
-  const over = total > GOAL;
-  const pct = Math.min(total / GOAL, 1);
+  const over  = total > GOAL;
+  const pct   = Math.min(total / GOAL, 1);
   document.getElementById('ring-total').textContent = total;
   document.getElementById('ring-total').style.color = over ? '#ef4444' : '#0f172a';
-  document.getElementById('ring-arc').setAttribute('stroke-dasharray', `${pct * CIRC} ${CIRC}`);
+  document.getElementById('ring-arc').setAttribute('stroke-dasharray', `${pct * CAL_CIRC} ${CAL_CIRC}`);
   document.getElementById('ring-arc').setAttribute('stroke', over ? '#ef4444' : '#0d9488');
+
   const remLabel = document.getElementById('rem-label');
-  const remVal = document.getElementById('rem-val');
+  const remVal   = document.getElementById('rem-val');
   const diff = Math.abs(GOAL - total);
   remLabel.textContent = over ? 'Over by' : 'Remaining';
-  remLabel.style.color = over ? '#ef4444' : '#2563eb';
-  remVal.innerHTML = `${diff} <span>cal</span>`;
+  remLabel.style.color = over ? '#ef4444' : '#0d9488';
+  remVal.innerHTML = `${diff} <span style="font-size:11px;color:#94a3b8;font-weight:400;">cal</span>`;
   remVal.style.color = over ? '#ef4444' : '#0f172a';
-  document.getElementById('clear-btn').style.display = log.length ? 'inline-block' : 'none';
 
-  const carbs = totalCarbs();
-  document.getElementById('carb-val').innerHTML = `${Math.round(carbs * 10) / 10} <span>g</span>`;
+  // Carb ring
+  const carbs    = totalCarbs();
+  const carbOver = carbs > CARB_GOAL;
+  const carbPct  = Math.min(carbs / CARB_GOAL, 1);
+  const carbRounded = Math.round(carbs * 10) / 10;
+  document.getElementById('carb-total').textContent = carbRounded;
+  document.getElementById('carb-total').style.color = carbOver ? '#ef4444' : '#7c3aed';
+  document.getElementById('carb-arc').setAttribute('stroke-dasharray', `${carbPct * CARB_CIRC} ${CARB_CIRC}`);
+  document.getElementById('carb-arc').setAttribute('stroke', carbOver ? '#ef4444' : '#7c3aed');
+
+  const carbRemLabel = document.getElementById('carb-rem-label');
+  const carbRemVal   = document.getElementById('carb-rem-val');
+  const carbDiff = Math.round(Math.abs(CARB_GOAL - carbs) * 10) / 10;
+  carbRemLabel.textContent = carbOver ? 'Over by' : 'Remaining';
+  carbRemLabel.style.color = carbOver ? '#ef4444' : '#7c3aed';
+  carbRemVal.innerHTML = `${carbDiff} <span style="font-size:11px;color:#94a3b8;font-weight:400;">g</span>`;
+  carbRemVal.style.color = carbOver ? '#ef4444' : '#7c3aed';
+
+  document.getElementById('clear-btn').style.display = log.length ? 'inline-block' : 'none';
 }
 
 function renderLog() {
@@ -365,7 +420,7 @@ function renderGrid() {
           <span class="food-name" style="flex:1">${f.name}</span>
           ${deleteBtn}
         </div>
-        <div class="food-cal">${f.cal} cal / ${f.unit}</div>
+        <div class="food-cal">${f.cal} cal / ${f.carb || 0}g / ${f.unit}</div>
         <div class="food-row">
           <input class="food-qty-input" id="qty-${f.id}" type="number" min="0.5" step="0.5" value="1">
           <button class="add-btn" onclick="addEntry(${f.id})">+ Add</button>
