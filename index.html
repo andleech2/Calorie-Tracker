@@ -395,7 +395,7 @@ function renderLog() {
   if (!log.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   list.innerHTML = log.map(entry => {
-    const f = FOODS_BASE.find(f => f.id === entry.foodId);
+    const f = FOODS_BASE.find(f => f.id === entry.foodId) || FOODS.find(f => f.id === entry.foodId);
     if (!f) return '';
     return `
       <div class="log-row">
