@@ -404,10 +404,10 @@ function renderLog() {
           <span class="log-meta">${entry.qty} ${f.unit} · ${f.cal * entry.qty} cal</span>
         </div>
         <div class="log-btns">
-          <button class="ctrl-btn btn-dec" onclick="adjustQty(${f.id}, -1)">−</button>
-          <span class="log-qty">${entry.qty}</span>
-          <button class="ctrl-btn btn-inc" onclick="adjustQty(${f.id}, 1)">+</button>
           <button class="ctrl-btn btn-del" onclick="removeEntry(${f.id})">✕</button>
+          <span class="log-qty" style="margin-left:8px;">${entry.qty}</span>
+          <button class="ctrl-btn btn-dec" onclick="adjustQty(${f.id}, -1)">−</button>
+          <button class="ctrl-btn btn-inc" onclick="adjustQty(${f.id}, 1)">+</button>
         </div>
       </div>`;
   }).join('');
