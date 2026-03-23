@@ -229,7 +229,7 @@
   </div>
 
   <!-- New Custom Food -->
-  <div class="card card-last">
+  <div class="card">
     <div class="section-label" style="margin-bottom:12px">Add New Food</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <input id="new-name" type="text" placeholder="Food name" style="flex:2;min-width:120px;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;color:#0f172a;">
@@ -252,14 +252,34 @@
     <div id="new-food-error" style="font-size:11px;color:#ef4444;margin-top:6px;display:none;">Please enter a name and calories.</div>
   </div>
 
-</div>
+  <!-- Peanut Calculator -->
+  <div class="card card-last">
+    <div class="section-label" style="margin-bottom:4px">🥜 Peanut Calculator</div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:12px;">Based on your remaining calories & carbs</div>
+    <div id="pnut-result" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:12px;text-align:center;">
+      <div style="font-size:11px;font-weight:700;color:#0d9488;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">You can have</div>
+      <div id="pnut-grams" style="font-size:32px;font-weight:900;color:#0f172a;font-family:'Source Code Pro',monospace;line-height:1;">—</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:2px;">grams of peanuts</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <div style="flex:1;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:8px;padding:8px 10px;">
+          <div style="font-size:10px;font-weight:700;color:#0d9488;text-transform:uppercase;letter-spacing:0.08em;">Calories</div>
+          <div id="pnut-cal-cost" style="font-size:18px;font-weight:700;color:#0f172a;font-family:'Source Code Pro',monospace;padding:2px 0;">—</div>
+        </div>
+        <div style="flex:1;background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:8px;padding:8px 10px;">
+          <div style="font-size:10px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:0.08em;">Carbs</div>
+          <div id="pnut-carb-cost" style="font-size:18px;font-weight:700;color:#7c3aed;font-family:'Source Code Pro',monospace;padding:2px 0;">—</div>
+        </div>
+      </div>
+      <div id="pnut-limited-by" style="font-size:11px;font-weight:600;margin-top:8px;"></div>
+    </div>
+  </div>
 
 <script>
 const GOAL = 1222;
 
 const FOODS_BASE = [
   { id: 1,  name: "Hamburger Patty", cal: 380, carb: 0,   unit: "each" },
-  { id: 12, name: "Egg",             cal: 80,  carb: 0,   unit: "each" },
+  { id: 12, name: "Egg",             cal: 75,  carb: 0,   unit: "each" },
   { id: 11, name: "Cheese",          cal: 200, carb: 1,   unit: "slice" },
   { id: 4,  name: "Butter",          cal: 110, carb: 0,   unit: "tbs" },
   { id: 2,  name: "Cacao",           cal: 20,  carb: 3,   unit: "tbs" },
@@ -270,6 +290,7 @@ const FOODS_BASE = [
   { id: 7,  name: "Sardines",        cal: 150, carb: 0,   unit: "can" },
   { id: 8,  name: "Oysters",         cal: 200, carb: 0,   unit: "can" },
   { id: 6,  name: "Salmon-Kirkland",  cal: 80,  carb: 0,   unit: "1/2 can" },
+  { id: 21, name: "Salmon Chick-o-Sea", cal: 100, carb: 0, unit: "can" },
   { id: 16, name: "Mackerel Can",    cal: 130, carb: 0,   unit: "can" },
   { id: 9,  name: "Mackerel",        cal: 90,  carb: 0,   unit: "bag" },
   { id: 14, name: "Chicken Sausage", cal: 30,  carb: 0,   unit: "each" },
@@ -277,7 +298,7 @@ const FOODS_BASE = [
   { id: 13, name: "Beet Root",       cal: 15,  carb: 3,   unit: "tsp" },
   { id: 17, name: "Jalapeños",       cal: 2.5, carb: 0.5, unit: "tbs" },
   { id: 19, name: "Garlic",          cal: 10,  carb: 0,   unit: "each" },
-  { id: 20, name: "Peanuts",         cal: 85,  carb: 3,   unit: "1/8 cup" },
+  { id: 20, name: "Peanuts",         cal: 85,  carb: 3,   unit: "15g" },
 ];
 
 // Load saved order or use default
@@ -389,6 +410,7 @@ function updateRing() {
   carbRemVal.style.color = carbOver ? '#ef4444' : '#7c3aed';
 
   document.getElementById('clear-btn').style.display = log.length ? 'inline-block' : 'none';
+  calcPeanuts();
 }
 
 function renderLog() {
@@ -476,6 +498,36 @@ function adjustQty(foodId, delta) {
 
 function clearDay() {
   log = []; save(); render(); renderLog();
+}
+
+function calcPeanuts() {
+  const calPerg  = 85 / 15;
+  const carbPerg = 3 / 15;
+  const calRem  = Math.max(0, GOAL - totalCal());
+  const carbRem = Math.max(0, CARB_GOAL - totalCarbs());
+
+  const maxByCal  = calRem  / calPerg;
+  const maxByCarb = carbRem / carbPerg;
+  const maxG = Math.floor(Math.min(maxByCal, maxByCarb));
+
+  const calCost  = Math.round(maxG * calPerg);
+  const carbCost = Math.round(maxG * carbPerg * 10) / 10;
+
+  const limitedBy = document.getElementById('pnut-limited-by');
+  document.getElementById('pnut-grams').textContent     = maxG <= 0 ? '0' : maxG;
+  document.getElementById('pnut-cal-cost').textContent  = maxG <= 0 ? '0' : calCost;
+  document.getElementById('pnut-carb-cost').textContent = maxG <= 0 ? '0' : carbCost + 'g';
+
+  if (maxG <= 0) {
+    limitedBy.textContent = 'No room left today';
+    limitedBy.style.color = '#ef4444';
+  } else if (maxByCal < maxByCarb) {
+    limitedBy.textContent = 'Limited by calories';
+    limitedBy.style.color = '#0d9488';
+  } else {
+    limitedBy.textContent = 'Limited by carbs';
+    limitedBy.style.color = '#7c3aed';
+  }
 }
 
 function deleteCustomFood(foodId) {
