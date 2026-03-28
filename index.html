@@ -300,6 +300,8 @@ const FOODS_BASE = [
   { id: 19, name: "Garlic",          cal: 10,  carb: 0,   unit: "each" },
   { id: 20, name: "Peanuts",         cal: 85,  carb: 3,   unit: "15g" },
   { id: 22, name: "Pickles",         cal: 10,  carb: 2,   unit: "175g" },
+  { id: 23, name: "Burger Half",     cal: 190, carb: 0,   unit: "each" },
+  { id: 24, name: "Weiner Half",     cal: 110, carb: 0,   unit: "each" },
 ];
 
 // Load saved order or use default
@@ -350,7 +352,10 @@ function addCustomFood() {
 
 let FOODS = loadOrder();
 
-const todayKey = () => `callog:${new Date().toISOString().slice(0,10)}`;
+const todayKey = () => {
+  const d = new Date();
+  return `callog:${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
 let log = JSON.parse(localStorage.getItem(todayKey()) || '[]');
 
 function save() {
