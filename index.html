@@ -236,8 +236,10 @@
       <input id="new-cal" type="number" placeholder="Cal" min="1" style="width:60px;padding:7px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Source Code Pro',monospace;outline:none;color:#0f172a;">
       <input id="new-carb" type="number" placeholder="Carbs g" min="0" step="0.1" style="width:72px;padding:7px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Source Code Pro',monospace;outline:none;color:#0f172a;">
       <select id="new-unit" style="flex:1;min-width:80px;padding:7px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;color:#0f172a;background:white;">
+        <option value="each" selected>each</option>
         <option value="tbs">tbs</option>
-        <option value="each">each</option>
+        <option value="1/2 tbs">1/2 tbs</option>
+        <option value="tsp">tsp</option>
         <option value="can">can</option>
         <option value="bag">bag</option>
         <option value="slice">slice</option>
@@ -278,17 +280,19 @@
 const GOAL = 1222;
 
 const FOODS_BASE = [
-  { id: 15, name: "Beef Wiener",     cal: 220, carb: 0,   unit: "each" },
   { id: 13, name: "Beet Root",       cal: 15,  carb: 3,   unit: "tsp" },
+  { id: 1,  name: "Burger",          cal: 380, carb: 0,   unit: "each" },
   { id: 23, name: "Burger Half",     cal: 190, carb: 0,   unit: "each" },
   { id: 4,  name: "Butter",          cal: 110, carb: 0,   unit: "tbs" },
   { id: 2,  name: "Cacao",           cal: 20,  carb: 3,   unit: "tbs" },
+  { id: 27, name: "Cacao Half",      cal: 10,  carb: 1.5, unit: "tbs" },
   { id: 11, name: "Cheese",          cal: 200, carb: 1,   unit: "slice" },
+  { id: 28, name: "Cheese Half",     cal: 100, carb: 0.5, unit: "slice" },
   { id: 14, name: "Chicken Sausage", cal: 30,  carb: 0,   unit: "each" },
+  { id: 29, name: "Coconut Half",    cal: 65,  carb: 0,   unit: "tbs" },
   { id: 3,  name: "Coconut Oil",     cal: 130, carb: 0,   unit: "tbs" },
   { id: 12, name: "Egg",             cal: 75,  carb: 0,   unit: "each" },
   { id: 19, name: "Garlic",          cal: 10,  carb: 0,   unit: "each" },
-  { id: 1,  name: "Hamburger Patty", cal: 380, carb: 0,   unit: "each" },
   { id: 18, name: "Heavy Cream",     cal: 55,  carb: 0,   unit: "tbs" },
   { id: 17, name: "Jalapeños",       cal: 2.5, carb: 0.5, unit: "tbs" },
   { id: 9,  name: "Mackerel",        cal: 90,  carb: 0,   unit: "bag" },
@@ -298,12 +302,13 @@ const FOODS_BASE = [
   { id: 20, name: "Peanuts",         cal: 85,  carb: 3,   unit: "15g" },
   { id: 22, name: "Pickles",         cal: 10,  carb: 2,   unit: "175g" },
   { id: 26, name: "Popsicle C/W",   cal: 60,  carb: 3.8, unit: "each" },
-  { id: 6,  name: "Salmon-Kirkland", cal: 80,  carb: 0,   unit: "1/2 can" },
   { id: 21, name: "Salmon CotS",     cal: 100, carb: 0,   unit: "can" },
+  { id: 6,  name: "Salmon-Kirkland", cal: 80,  carb: 0,   unit: "1/2 can" },
   { id: 7,  name: "Sardines",        cal: 150, carb: 0,   unit: "can" },
   { id: 25, name: "Sardines CotS",   cal: 130, carb: 0,   unit: "can" },
-  { id: 24, name: "Weiner Half",     cal: 110, carb: 0,   unit: "each" },
+  { id: 24, name: "Wiener Half",     cal: 110, carb: 0,   unit: "each" },
   { id: 5,  name: "Whey",            cal: 20,  carb: 0.4, unit: "tbs" },
+  { id: 15, name: "Wiener",          cal: 220, carb: 0,   unit: "each" },
 ];
 
 // Load saved order or use default
