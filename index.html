@@ -254,6 +254,28 @@
     <div id="new-food-error" style="font-size:11px;color:#ef4444;margin-top:6px;display:none;">Please enter a name and calories.</div>
   </div>
 
+  <!-- Cheese Calculator -->
+  <div class="card">
+    <div class="section-label" style="margin-bottom:4px">🧀 Cheese Calculator</div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:12px;">Enter weight in grams to get cal & carbs</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+      <input id="cheese-grams" type="number" min="0" step="1" placeholder="grams"
+        oninput="calcCheese()"
+        style="flex:1;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:18px;font-weight:700;color:#0f172a;font-family:'Source Code Pro',monospace;outline:none;">
+      <div style="font-size:13px;color:#94a3b8;font-weight:600;">g</div>
+    </div>
+    <div id="cheese-result" style="display:flex;gap:8px;">
+      <div style="flex:1;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:8px;padding:8px 10px;">
+        <div style="font-size:10px;font-weight:700;color:#0d9488;text-transform:uppercase;letter-spacing:0.08em;">Calories</div>
+        <div id="cheese-cal" style="font-size:18px;font-weight:700;color:#0f172a;font-family:'Source Code Pro',monospace;padding:2px 0;">—</div>
+      </div>
+      <div style="flex:1;background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:8px;padding:8px 10px;">
+        <div style="font-size:10px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:0.08em;">Carbs</div>
+        <div id="cheese-carb" style="font-size:18px;font-weight:700;color:#7c3aed;font-family:'Source Code Pro',monospace;padding:2px 0;">—</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Peanut Calculator -->
   <div class="card card-last">
     <div class="section-label" style="margin-bottom:4px">🥜 Peanut Calculator</div>
@@ -280,6 +302,7 @@
 const GOAL = 1222;
 
 const FOODS_BASE = [
+  { id: 30, name: "BeefStick",       cal: 100, carb: 1,   unit: "each" },
   { id: 13, name: "Beet Root",       cal: 15,  carb: 3,   unit: "tsp" },
   { id: 1,  name: "Burger",          cal: 380, carb: 0,   unit: "each" },
   { id: 23, name: "Burger Half",     cal: 190, carb: 0,   unit: "each" },
@@ -302,12 +325,14 @@ const FOODS_BASE = [
   { id: 20, name: "Peanuts",         cal: 85,  carb: 3,   unit: "15g" },
   { id: 22, name: "Pickles",         cal: 10,  carb: 2,   unit: "175g" },
   { id: 26, name: "Popsicle C/W",   cal: 60,  carb: 3.8, unit: "each" },
+  { id: 31, name: "Salmon",          cal: 200, carb: 0,   unit: "each" },
   { id: 21, name: "Salmon CotS",     cal: 100, carb: 0,   unit: "can" },
   { id: 6,  name: "Salmon-Kirkland", cal: 80,  carb: 0,   unit: "1/2 can" },
   { id: 7,  name: "Sardines",        cal: 150, carb: 0,   unit: "can" },
   { id: 25, name: "Sardines CotS",   cal: 130, carb: 0,   unit: "can" },
-  { id: 24, name: "Wiener Half",     cal: 110, carb: 0,   unit: "each" },
+  { id: 32, name: "Tuna Can",        cal: 110, carb: 0,   unit: "can" },
   { id: 5,  name: "Whey",            cal: 20,  carb: 0.4, unit: "tbs" },
+  { id: 24, name: "Wiener Half",     cal: 110, carb: 0,   unit: "each" },
   { id: 15, name: "Wiener",          cal: 220, carb: 0,   unit: "each" },
 ];
 
@@ -511,6 +536,17 @@ function adjustQty(foodId, delta) {
 
 function clearDay() {
   log = []; save(); render(); renderLog();
+}
+
+function calcCheese() {
+  // 28g = 100 cal, 1g carb
+  const calPerg  = 100 / 28;
+  const carbPerg = 1 / 28;
+  const grams = parseFloat(document.getElementById('cheese-grams').value) || 0;
+  const cal  = Math.round(grams * calPerg);
+  const carb = Math.round(grams * carbPerg * 10) / 10;
+  document.getElementById('cheese-cal').textContent  = grams > 0 ? cal  : '—';
+  document.getElementById('cheese-carb').textContent = grams > 0 ? carb + 'g' : '—';
 }
 
 function calcPeanuts() {
