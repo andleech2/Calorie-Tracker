@@ -257,7 +257,23 @@
   <!-- Cheese Calculator -->
   <div class="card">
     <div class="section-label" style="margin-bottom:4px">🧀 Cheese Calculator</div>
-    <div style="font-size:11px;color:#94a3b8;margin-bottom:12px;">Enter weight in grams to get cal & carbs</div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:12px;">Max for your remaining cal & carbs, or enter grams below</div>
+    <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:12px;text-align:center;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;color:#0d9488;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">You can have</div>
+      <div id="cheese-max-g" style="font-size:32px;font-weight:900;color:#0f172a;font-family:'Source Code Pro',monospace;line-height:1;">—</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:2px;">grams of cheese</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <div style="flex:1;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:8px;padding:8px 10px;">
+          <div style="font-size:10px;font-weight:700;color:#0d9488;text-transform:uppercase;letter-spacing:0.08em;">Calories</div>
+          <div id="cheese-max-cal" style="font-size:18px;font-weight:700;color:#0f172a;font-family:'Source Code Pro',monospace;padding:2px 0;">—</div>
+        </div>
+        <div style="flex:1;background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:8px;padding:8px 10px;">
+          <div style="font-size:10px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:0.08em;">Carbs</div>
+          <div id="cheese-max-carb" style="font-size:18px;font-weight:700;color:#7c3aed;font-family:'Source Code Pro',monospace;padding:2px 0;">—</div>
+        </div>
+      </div>
+      <div id="cheese-limited-by" style="font-size:11px;font-weight:600;margin-top:8px;"></div>
+    </div>
     <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
       <input id="cheese-grams" type="number" min="0" step="1" placeholder="grams"
         oninput="calcCheese()"
@@ -306,8 +322,9 @@ const FOODS_BASE = [
   { id: 13, name: "Beet Root",       cal: 15,  carb: 3,   unit: "tsp" },
   { id: 1,  name: "Burger",          cal: 380, carb: 0,   unit: "each" },
   { id: 23, name: "Burger Half",     cal: 190, carb: 0,   unit: "each" },
-  { id: 4,  name: "Butter",          cal: 110, carb: 0,   unit: "tbs" },
+  { id: 4,  name: "Butter",          cal: 100, carb: 0,   unit: "tbs" },
   { id: 2,  name: "Cacao",           cal: 20,  carb: 3,   unit: "tbs" },
+  { id: 33, name: "Cacao 3 Tbs",    cal: 90,  carb: 4,   unit: "each" },
   { id: 27, name: "Cacao Half",      cal: 10,  carb: 1.5, unit: "tbs" },
   { id: 11, name: "Cheese",          cal: 200, carb: 1,   unit: "slice" },
   { id: 28, name: "Cheese Half",     cal: 100, carb: 0.5, unit: "slice" },
@@ -330,10 +347,13 @@ const FOODS_BASE = [
   { id: 6,  name: "Salmon-Kirkland", cal: 80,  carb: 0,   unit: "1/2 can" },
   { id: 7,  name: "Sardines",        cal: 150, carb: 0,   unit: "can" },
   { id: 25, name: "Sardines CotS",   cal: 130, carb: 0,   unit: "can" },
+  { id: 34, name: "Sauerkraut 2 Tbs", cal: 5, carb: 2,   unit: "each" },
+  { id: 35, name: "Smashburger",     cal: 320, carb: 0,   unit: "each" },
   { id: 32, name: "Tuna Can",        cal: 110, carb: 0,   unit: "can" },
   { id: 5,  name: "Whey",            cal: 20,  carb: 0.4, unit: "tbs" },
   { id: 24, name: "Wiener Half",     cal: 110, carb: 0,   unit: "each" },
   { id: 15, name: "Wiener",          cal: 220, carb: 0,   unit: "each" },
+  { id: 36, name: "Yogurt 2 Tbs",    cal: 40,  carb: 2,   unit: "each" },
 ];
 
 // Load saved order or use default
@@ -549,7 +569,25 @@ function calcCheese() {
   document.getElementById('cheese-carb').textContent = grams > 0 ? carb + 'g' : '—';
 }
 
+function calcCheeseMax() {
+  const calPerg  = 100 / 28;
+  const carbPerg = 1 / 28;
+  const calRem  = Math.max(0, GOAL - totalCal());
+  const carbRem = Math.max(0, CARB_GOAL - totalCarbs());
+  const maxByCal  = calRem  / calPerg;
+  const maxByCarb = carbRem / carbPerg;
+  const maxG = Math.floor(Math.min(maxByCal, maxByCarb));
+  const lim = document.getElementById('cheese-limited-by');
+  document.getElementById('cheese-max-g').textContent    = maxG > 0 ? maxG : '0';
+  document.getElementById('cheese-max-cal').textContent  = maxG > 0 ? Math.round(maxG * calPerg) : '0';
+  document.getElementById('cheese-max-carb').textContent = maxG > 0 ? (Math.round(maxG * carbPerg * 10) / 10) + 'g' : '0g';
+  if (maxG <= 0)               { lim.textContent = 'No room left today'; lim.style.color = '#ef4444'; }
+  else if (maxByCal < maxByCarb){ lim.textContent = 'Limited by calories'; lim.style.color = '#0d9488'; }
+  else                          { lim.textContent = 'Limited by carbs';    lim.style.color = '#7c3aed'; }
+}
+
 function calcPeanuts() {
+  calcCheeseMax();
   const calPerg  = 85 / 15;
   const carbPerg = 3 / 15;
   const calRem  = Math.max(0, GOAL - totalCal());
